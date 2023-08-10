@@ -11,4 +11,7 @@ defmodule Kantox.Store do
 
   @callback get_by_id(atom(), integer()) :: {:ok, map()} | {:error, any()}
   defdelegate get_by_id(table, id), to: @adapter
+
+  @callback clear_data(atom()) :: :ok
+  defdelegate clear_data(table), to: @adapter
 end

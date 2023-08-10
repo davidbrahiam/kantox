@@ -23,4 +23,10 @@ defmodule Kantox.Store.ETS do
       _ -> nil
     end
   end
+
+  @impl true
+  def clear_data(table) do
+    true = :ets.delete_all_objects(table)
+    :ok
+  end
 end

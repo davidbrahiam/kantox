@@ -9,6 +9,8 @@ config :kantox, KantoxWeb.Endpoint,
 
 config :kantox, Kantox.Store, Kantox.Store.Mock
 
+config :kantox, :warmers, []
+
 # Print only warnings and errors during test
 config :logger, level: :warning
 

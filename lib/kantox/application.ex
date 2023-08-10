@@ -5,16 +5,17 @@ defmodule Kantox.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
-      # Start the Telemetry supervisor
-      KantoxWeb.Telemetry,
-      Kantox.Cache.ETS,
-      # Start the Endpoint (http/https)
-      KantoxWeb.Endpoint
+    load_config()
+    initial_children = [Kantox.Cache.ETS] ++ warmers()
 
-      # Start a worker by calling: Kantox.Worker.start_link(arg)
-      # {Kantox.Worker, arg}
-    ]
+    children =
+      initial_children ++
+        [
+          # Start the Telemetry supervisor
+          KantoxWeb.Telemetry,
+          # Start the Endpoint (http/https)
+          KantoxWeb.Endpoint
+        ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
@@ -28,5 +29,14 @@ defmodule Kantox.Application do
   def config_change(changed, _new, removed) do
     KantoxWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp load_config() do
+    table = Application.get_env(:kantox, :products_table, :products)
+    :persistent_term.put(:products_table, table)
+  end
+
+  defp warmers() do
+    Application.get_env(:kantox, :warmers, [])
   end
 end

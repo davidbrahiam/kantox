@@ -4,7 +4,9 @@ defmodule Kantox.StoreTest do
 
   setup do
     Mox.stub_with(Kantox.Store.Mock, Kantox.Store.ETS)
-    %{table: :products}
+    table = :persistent_term.get(:products_table)
+    :ok = Kantox.Store.clear_data(table)
+    %{table: table}
   end
 
   describe "insert/2" do
@@ -59,6 +61,16 @@ defmodule Kantox.StoreTest do
       assert_raise ArgumentError, fn ->
         Kantox.Store.get_by_id(:table2, "key3") == :ok
       end
+    end
+  end
+
+  describe "clear_data/1" do
+    @tag :ets_get
+    test "when executed clears all previous data from the given table", %{table: table} do
+      assert Kantox.Store.insert(table, {"key1", 2}) == :ok
+      assert Kantox.Store.get_by_id(table, "key1") == 2
+      assert Kantox.Store.clear_data(table) == :ok
+      assert is_nil(Kantox.Store.get_by_id(table, "key1"))
     end
   end
 end

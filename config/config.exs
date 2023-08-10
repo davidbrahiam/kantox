@@ -12,12 +12,15 @@ config :kantox, KantoxWeb.Endpoint,
   url: [host: "localhost"],
   http: [port: 4000],
   render_errors: [
-    formats: [html: KantoxWeb.ErrorHTML, json: KantoxWeb.ErrorJSON],
+    formats: [json: KantoxWeb.ErrorJSON],
     layout: false
   ],
-  live_view: [signing_salt: "esHx0M1c"]
+  code_reloader: true,
+  server: true
 
 config :kantox, Kantox.Store, Kantox.Store.ETS
+
+config :kantox, :warmers, [Kantox.Warmers.Product]
 
 # Configures Elixir's Logger
 config :logger, :console,
