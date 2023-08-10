@@ -17,6 +17,7 @@ config :kantox, KantoxWeb.Endpoint,
   ],
   live_view: [signing_salt: "esHx0M1c"]
 
+config :kantox, Kantox.Store, Kantox.Store.ETS
 
 # Configures Elixir's Logger
 config :logger, :console,

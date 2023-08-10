@@ -11,7 +11,6 @@ defmodule KantoxWeb.Endpoint do
     same_site: "Lax"
   ]
 
-
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 

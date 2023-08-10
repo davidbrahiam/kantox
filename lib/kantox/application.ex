@@ -1,6 +1,4 @@
 defmodule Kantox.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
@@ -10,8 +8,10 @@ defmodule Kantox.Application do
     children = [
       # Start the Telemetry supervisor
       KantoxWeb.Telemetry,
+      Kantox.Cache.ETS,
       # Start the Endpoint (http/https)
       KantoxWeb.Endpoint
+
       # Start a worker by calling: Kantox.Worker.start_link(arg)
       # {Kantox.Worker, arg}
     ]

@@ -8,7 +8,6 @@ config :kantox, KantoxWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "vIbG0SBnoZ2tSAAsQCXhiXteWTwysoRT1GbHa/npizb4n9d3sMYX1U9g4hHx93kX"
 
-
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 

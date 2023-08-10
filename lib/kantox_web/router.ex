@@ -9,5 +9,4 @@ defmodule KantoxWeb.Router do
   scope "/", KantoxWeb do
     pipe_through :api
   end
-
 end
