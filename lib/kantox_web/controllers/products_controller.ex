@@ -3,8 +3,7 @@ defmodule KantoxWeb.Controllers.ProductsController do
   require Logger
 
   def index(conn, _params) do
-    # TODO: Replace list/0 when service is created
-    {status, response} = {:ok, []}
+    {status, response} = KantoxWeb.Services.Products.List.list()
     handle_response(conn, status, response)
   end
 

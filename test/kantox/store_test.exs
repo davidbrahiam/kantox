@@ -64,8 +64,17 @@ defmodule Kantox.StoreTest do
     end
   end
 
+  describe "all/1" do
+    @tag :ets_all
+    test "when executed returns all objects present in the given table", %{table: table} do
+      assert Kantox.Store.all(table) == []
+      assert Kantox.Store.insert(table, {"key1", 2}) == :ok
+      assert Kantox.Store.all(table) == [{"key1", 2}]
+    end
+  end
+
   describe "clear_data/1" do
-    @tag :ets_get
+    @tag :ets_clear_data
     test "when executed clears all previous data from the given table", %{table: table} do
       assert Kantox.Store.insert(table, {"key1", 2}) == :ok
       assert Kantox.Store.get_by_id(table, "key1") == 2

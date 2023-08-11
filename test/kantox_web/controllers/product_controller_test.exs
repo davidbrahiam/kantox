@@ -1,12 +1,50 @@
 defmodule KantoxWeb.Controllers.ProductControllerTest do
   use KantoxWeb.ConnCase, async: true
 
+  setup do
+    Mox.stub_with(Kantox.Store.Mock, Kantox.Store.ETS)
+
+    table = :persistent_term.get(:products_table)
+    :ok = Kantox.Store.clear_data(table)
+    %{table: table}
+  end
+
   describe "GET /products/list" do
-    @tag :prodcuts_list
-    test "when requested returns products available products to purchase", %{conn: conn} do
+    @tag :products_list
+    test "when no products available", %{conn: conn} do
       %{status: 200, resp_body: response} = get(conn, Routes.products_path(conn, :index))
 
       assert Jason.decode!(response) == []
+    end
+
+    @tag :products_list
+    test "when requested returns products available products", %{conn: conn, table: table} do
+      [
+        {"GR1",
+         %{
+           id: "GR1",
+           name: "Green tea",
+           price: 3.11,
+           promotion: %{condition: :equals_to, discount: 1.555, elements: 2}
+         }},
+        {"SR1",
+         %{
+           id: "SR1",
+           name: "Strawberries",
+           price: Decimal.new("5.00"),
+           promotion: nil
+         }},
+      ]
+      |> Enum.each(&(:ok = Kantox.Store.insert(table, &1)))
+
+      %{status: 200, resp_body: response} = get(conn, Routes.products_path(conn, :index))
+
+
+      assert Jason.decode!(response) ==
+        [
+          %{"id" => "SR1", "name" => "Strawberries", "price" => "5.00", "promotion" => nil},
+          %{"id" => "GR1", "name" => "Green tea", "price" => "3.11", "promotion" => %{"condition" => "equals_to", "discount" => "1.555", "elements" => 2}}
+        ]
     end
   end
 

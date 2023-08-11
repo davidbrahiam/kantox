@@ -25,6 +25,12 @@ defmodule Kantox.Store.ETS do
   end
 
   @impl true
+  def all(table) do
+    query = [{{:"$1", :"$2"},[], [{{:"$1", :"$2"}}]}]
+    :ets.select(table, query)
+  end
+
+  @impl true
   def clear_data(table) do
     true = :ets.delete_all_objects(table)
     :ok

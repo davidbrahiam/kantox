@@ -7,8 +7,9 @@ defmodule Kantox.Cache.ETS do
   end
 
   def init(_) do
-    table = :persistent_term.get(:products_table)
+    table = Application.get_env(:kantox, :products_table, :products)
     table_name = :ets.new(table, [:named_table, :set, :public, read_concurrency: true])
+    :persistent_term.put(:products_table, table)
 
     {:ok, table_name}
   end
