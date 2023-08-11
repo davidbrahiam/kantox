@@ -14,9 +14,29 @@ defmodule Kantox.Warmers.ProductTest do
   test "When it's initialized correctly", %{table: table} do
     Kantox.Warmers.Product.execute()
 
-    assert Kantox.Store.get_by_id(table, "GR1") == %{id: "GR1", name: "Green tea", price: 3.11}
-    assert Kantox.Store.get_by_id(table, "SR1") == %{id: "SR1", name: "Strawberries", price: 5.0}
-    assert Kantox.Store.get_by_id(table, "CF1") == %{id: "CF1", name: "Coffee", price: 11.23}
+    assert Kantox.Store.get_by_id(table, "GR1") ==
+             %{
+               id: "GR1",
+               name: "Green tea",
+               price: 3.11,
+               promotion: %{condition: :equals_to, discount: 1.555, elements: 2}
+             }
+
+    assert Kantox.Store.get_by_id(table, "SR1") ==
+             %{
+               id: "SR1",
+               name: "Strawberries",
+               price: 5.00,
+               promotion: %{condition: :greather_than, discount: 0.5, elements: 3}
+             }
+
+    assert Kantox.Store.get_by_id(table, "CF1") ==
+             %{
+               id: "CF1",
+               name: "Coffee",
+               price: 11.23,
+               promotion: %{condition: :greather_than, discount: 7.4867, elements: 3}
+             }
   end
 
   @tag :warmer

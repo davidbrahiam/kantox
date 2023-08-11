@@ -5,7 +5,8 @@ import Config
 config :kantox, KantoxWeb.Endpoint,
   http: [host: "localhost", port: 4002],
   secret_key_base: "PoFgbDzLiSeX7WQU/6CxdswpP9lNjpTiCUCiRK3mKUVjwU2U7lGey+NTcXLUpTth",
-  server: false
+  server: false,
+  code_reloader: false
 
 config :kantox, Kantox.Store, Kantox.Store.Mock
 

@@ -21,7 +21,7 @@ defmodule KantoxWeb do
 
   def router do
     quote do
-      use Phoenix.Router, helpers: false
+      use Phoenix.Router, helpers: true
 
       # Import common connection and controller functions to use in pipelines
       import Plug.Conn
@@ -42,6 +42,7 @@ defmodule KantoxWeb do
         layouts: [html: KantoxWeb.Layouts]
 
       import Plug.Conn
+      import KantoxWeb.Controllers.Utils
 
       unquote(verified_routes())
     end
