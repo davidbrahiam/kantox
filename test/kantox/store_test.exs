@@ -4,82 +4,67 @@ defmodule Kantox.StoreTest do
 
   setup do
     Mox.stub_with(Kantox.Store.Mock, Kantox.Store.ETS)
-    table = :persistent_term.get(:products_table)
-    :ok = Kantox.Store.clear_data(table)
-    %{table: table}
+
+    :ok = Kantox.Store.clear_data()
   end
 
   describe "insert/2" do
     @tag :ets_insert
-    test "when a item it's inserted it returns success", %{table: table} do
-      assert Kantox.Store.insert(table, {"key1", 2}) == :ok
-      assert Kantox.Store.get_by_id(table, "key1") == 2
+    test "when a item it's inserted it returns success" do
+      assert Kantox.Store.insert({"key1", 2}) == :ok
+      assert Kantox.Store.get_by_id("key1") == 2
     end
 
     @tag :ets_insert
     test "if the insert operation fails returns error" do
       assert_raise ArgumentError, fn ->
-        Kantox.Store.insert(:table2, {"key1", 2}) == :ok
+        Kantox.Store.insert(%{"key1" => 2})
       end
     end
   end
 
   describe "delete/2" do
     @tag :ets_delete
-    test "when a item it's deleted it returns success", %{table: table} do
-      assert Kantox.Store.insert(table, {"key1", 2}) == :ok
-      assert Kantox.Store.delete(table, "key1") == :ok
+    test "when a item it's deleted it returns success" do
+      assert Kantox.Store.insert({"key1", 2}) == :ok
+      assert Kantox.Store.delete("key1") == :ok
     end
 
     @tag :ets_delete
-    test "if delete operation fails returns error", %{table: table} do
-      assert Kantox.Store.delete(table, "key2") == :ok
-    end
-
-    @tag :ets_delete
-    test "if the delete operation fails returns error" do
-      assert_raise ArgumentError, fn ->
-        Kantox.Store.delete(:table2, "key3") == :ok
-      end
+    test "when attempting to delete a key that doens't exist returns success" do
+      assert Kantox.Store.delete("key2") == :ok
     end
   end
 
   describe "get/2" do
     @tag :ets_get
-    test "when getting an item it returns success", %{table: table} do
-      assert Kantox.Store.insert(table, {"key1", 2}) == :ok
-      assert Kantox.Store.get_by_id(table, "key1") == 2
+    test "when getting an item it returns success" do
+      assert Kantox.Store.insert({"key1", 2}) == :ok
+      assert Kantox.Store.get_by_id("key1") == 2
     end
 
     @tag :ets_get
-    test "when item not found returns nil", %{table: table} do
-      assert Kantox.Store.get_by_id(table, "key3") == nil
-    end
-
-    @tag :ets_get
-    test "if get operation fails returns error" do
-      assert_raise ArgumentError, fn ->
-        Kantox.Store.get_by_id(:table2, "key3") == :ok
-      end
+    test "when item not found returns nil" do
+      assert Kantox.Store.get_by_id("key3") == nil
     end
   end
 
   describe "all/1" do
     @tag :ets_all
-    test "when executed returns all objects present in the given table", %{table: table} do
-      assert Kantox.Store.all(table) == []
-      assert Kantox.Store.insert(table, {"key1", 2}) == :ok
-      assert Kantox.Store.all(table) == [{"key1", 2}]
+    test "when executed returns all objects present" do
+      assert Kantox.Store.all() == []
+      assert Kantox.Store.insert({"key1", 2}) == :ok
+      assert Kantox.Store.all() == [{"key1", 2}]
     end
   end
 
   describe "clear_data/1" do
     @tag :ets_clear_data
-    test "when executed clears all previous data from the given table", %{table: table} do
-      assert Kantox.Store.insert(table, {"key1", 2}) == :ok
-      assert Kantox.Store.get_by_id(table, "key1") == 2
-      assert Kantox.Store.clear_data(table) == :ok
-      assert is_nil(Kantox.Store.get_by_id(table, "key1"))
+    test "when executed clears all previous data from the store" do
+      assert Kantox.Store.insert({"key1", 2}) == :ok
+      assert Kantox.Store.get_by_id("key1") == 2
+      assert Kantox.Store.clear_data() == :ok
+      assert is_nil(Kantox.Store.get_by_id("key1"))
     end
   end
 end

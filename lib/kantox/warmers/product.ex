@@ -8,36 +8,34 @@ defmodule Kantox.Warmers.Product do
 
   require Logger
 
-  @table :products
-
   # It's executed only during the application's initialization
   def execute() do
     Logger.info("EXECUTING PRODUCT WARMER..")
 
     [
-      {"GR1",
-       %{
-         id: "GR1",
-         name: "Green tea",
-         price: 3.11,
-         promotion: %{condition: :equals_to, discount: 1.555, elements: 2}
-       }},
-      {"SR1",
-       %{
-         id: "SR1",
-         name: "Strawberries",
-         price: 5.00,
-         promotion: %{condition: :greather_than, discount: 0.5, elements: 3}
-       }},
-      {"CF1",
-       %{
-         id: "CF1",
-         name: "Coffee",
-         price: 11.23,
-         promotion: %{condition: :greather_than, discount: 7.4867, elements: 3}
-       }}
+      %{
+        id: "GR1",
+        name: "Green tea",
+        price: 3.11,
+        promotion: %{condition: "equal_to", discount: 1.555, elements: 2}
+      },
+      %{
+        id: "SR1",
+        name: "Strawberries",
+        price: 5.00,
+        promotion: %{condition: "greater_than", discount: 0.5, elements: 3}
+      },
+      %{
+        id: "CF1",
+        name: "Coffee",
+        price: 11.23,
+        promotion: %{condition: "greater_than", discount: 7.4867, elements: 3}
+      }
     ]
-    |> Enum.each(&(:ok = Kantox.Store.insert(@table, &1)))
+    |> Enum.each(fn product ->
+      {:ok, %{id: id} = product} = Kantox.Models.Product.build(product)
+      :ok = Kantox.Store.insert({id, product})
+    end)
 
     Logger.info("PRODUCT WARMER EXECUTED !!")
     :ok

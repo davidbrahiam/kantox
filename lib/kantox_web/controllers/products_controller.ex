@@ -7,9 +7,12 @@ defmodule KantoxWeb.Controllers.ProductsController do
     handle_response(conn, status, response)
   end
 
+  @purchase_schema %{
+    basket: [type: {:array, :string}, required: true]
+  }
   def purchase(conn, params) do
     {status, response} =
-      case KantoxWeb.Controllers.Requests.Products.Purchase.build(params) do
+      case Tarams.cast(params, @purchase_schema) do
         {:ok, _} ->
           # TODO:  Add service logic here
 
@@ -25,30 +28,9 @@ defmodule KantoxWeb.Controllers.ProductsController do
 
   def upsert(conn, params) do
     {status, response} =
-      case KantoxWeb.Controllers.Requests.Products.Upsert.build(params) do
+      case Kantox.Models.Product.build(params) do
         {:ok, params} ->
-          promotion =
-            case params.promotion do
-              nil ->
-                nil
-
-              promotion ->
-                %{
-                  discount: Decimal.to_string(promotion.discount),
-                  condition: Atom.to_string(promotion.condition),
-                  elements: promotion.elements
-                }
-            end
-
-          # TODO:  Add service logic here
-          params = %{
-            id: params.id,
-            name: params.name,
-            price: Decimal.to_string(params.price),
-            promotion: promotion
-          }
-
-          {:ok, params}
+          KantoxWeb.Services.Products.Upsert.upsert(params)
 
         {:error, error} ->
           Logger.error("#{inspect(error)}")

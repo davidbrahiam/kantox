@@ -4,9 +4,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
   setup do
     Mox.stub_with(Kantox.Store.Mock, Kantox.Store.ETS)
 
-    table = :persistent_term.get(:products_table)
-    :ok = Kantox.Store.clear_data(table)
-    %{table: table}
+    :ok = Kantox.Store.clear_data()
   end
 
   describe "GET /products/list" do
@@ -18,7 +16,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
     end
 
     @tag :products_list
-    test "when requested returns products available products", %{conn: conn, table: table} do
+    test "when requested returns products available products", %{conn: conn} do
       [
         {"GR1",
          %{
@@ -33,18 +31,31 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
            name: "Strawberries",
            price: Decimal.new("5.00"),
            promotion: nil
-         }},
+         }}
       ]
-      |> Enum.each(&(:ok = Kantox.Store.insert(table, &1)))
+      |> Enum.each(&(:ok = Kantox.Store.insert(&1)))
 
       %{status: 200, resp_body: response} = get(conn, Routes.products_path(conn, :index))
 
-
       assert Jason.decode!(response) ==
-        [
-          %{"id" => "SR1", "name" => "Strawberries", "price" => "5.00", "promotion" => nil},
-          %{"id" => "GR1", "name" => "Green tea", "price" => "3.11", "promotion" => %{"condition" => "equals_to", "discount" => "1.555", "elements" => 2}}
-        ]
+               [
+                 %{
+                   "id" => "SR1",
+                   "name" => "Strawberries",
+                   "price" => "5.00",
+                   "promotion" => nil
+                 },
+                 %{
+                   "id" => "GR1",
+                   "name" => "Green tea",
+                   "price" => "3.11",
+                   "promotion" => %{
+                     "condition" => "equals_to",
+                     "discount" => "1.555",
+                     "elements" => 2
+                   }
+                 }
+               ]
     end
   end
 
@@ -95,13 +106,41 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
   describe "PUT /products/upsert" do
     @tag :products_upsert
     test "when requested it updates the product if it exists", %{conn: conn} do
+      {:ok, product} =
+        Kantox.Models.Product.build(%{
+          "id" => "GR1",
+          "name" => "White tea",
+          "price" => "4.2",
+          "promotion" => %{
+            "elements" => 3,
+            "discount" => "0.1",
+            "condition" => "equal_to"
+          }
+        })
+
+      assert Kantox.Store.insert({product.id, product}) == :ok
+
+      assert Kantox.Store.all() == [
+               {"GR1",
+                %Kantox.Models.Product{
+                  id: "GR1",
+                  name: "White tea",
+                  price: Decimal.new("4.2"),
+                  promotion: %Kantox.Models.Promotion{
+                    condition: :equal_to,
+                    discount: Decimal.new("0.1"),
+                    elements: 3
+                  }
+                }}
+             ]
+
       body_params = %{
         "id" => "GR1",
-        "name" => "Green tea",
+        "name" => "Green teas",
         "price" => "4.2",
         "promotion" => %{
           "elements" => 3,
-          "discount" => 0.1,
+          "discount" => 2.1,
           "condition" => "equal_to"
         }
       }
@@ -114,14 +153,31 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
       assert Jason.decode!(response) ==
                %{
                  "id" => "GR1",
-                 "name" => "Green tea",
+                 "name" => "Green teas",
                  "price" => "4.2",
                  "promotion" => %{
                    "elements" => 3,
-                   "discount" => "0.1",
+                   "discount" => "2.1",
                    "condition" => "equal_to"
                  }
                }
+
+      assert Kantox.Store.all() ==
+               [
+                 {
+                   "GR1",
+                   %Kantox.Models.Product{
+                     id: "GR1",
+                     name: "Green teas",
+                     price: Decimal.new("4.2"),
+                     promotion: %Kantox.Models.Promotion{
+                       condition: :equal_to,
+                       discount: Decimal.new("2.1"),
+                       elements: 3
+                     }
+                   }
+                 }
+               ]
     end
 
     @tag :products_upsert

@@ -20,6 +20,8 @@ config :kantox, KantoxWeb.Endpoint,
 
 config :kantox, Kantox.Store, Kantox.Store.ETS
 
+config :kantox, :default_table, :products
+
 config :kantox, :warmers, [Kantox.Warmers.Product]
 
 # Configures Elixir's Logger

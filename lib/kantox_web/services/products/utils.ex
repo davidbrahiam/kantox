@@ -14,8 +14,8 @@ defmodule KantoxWeb.Services.Products.Utils do
 
         promotion ->
           %{
-            discount: decimal_to_string(promotion.discount),
-            condition: Atom.to_string(promotion.condition),
+            discount: Kantox.Utils.decimal_to_string(promotion.discount),
+            condition: Kantox.Utils.atom_to_string(promotion.condition),
             elements: promotion.elements
           }
       end
@@ -23,34 +23,8 @@ defmodule KantoxWeb.Services.Products.Utils do
     %{
       id: product.id,
       name: product.name,
-      price: decimal_to_string(product.price),
+      price: Kantox.Utils.decimal_to_string(product.price),
       promotion: promotion
     }
-  end
-
-  def atom_to_string(nil), do: nil
-
-  def atom_to_string(atom) when is_atom(atom) do
-    Atom.to_string(atom)
-  end
-
-  def atom_to_string(atom), do: atom
-
-  def decimal_to_string(nil), do: nil
-
-  def decimal_to_string(value) when is_number(value) do
-    "#{value}"
-  end
-
-  def decimal_to_string(value) when is_binary(value) do
-    value
-  end
-
-  def decimal_to_string(value) do
-    if Decimal.is_decimal(value) do
-      Decimal.to_string(value)
-    else
-      nil
-    end
   end
 end
