@@ -13,10 +13,8 @@ defmodule KantoxWeb.Controllers.ProductsController do
   def purchase(conn, params) do
     {status, response} =
       case Tarams.cast(params, @purchase_schema) do
-        {:ok, _} ->
-          # TODO:  Add service logic here
-
-          {:ok, %{total: 0}}
+        {:ok, params} ->
+          KantoxWeb.Services.Products.Purchase.purchase(params)
 
         {:error, error} ->
           Logger.error("#{inspect(error)}")

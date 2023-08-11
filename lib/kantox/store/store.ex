@@ -9,7 +9,7 @@ defmodule Kantox.Store do
   @callback delete(integer()) :: :ok
   defdelegate delete(id), to: @adapter
 
-  @callback get_by_id(integer()) :: {:ok, map()} | {:error, any()}
+  @callback get_by_id(integer()) :: list() | nil
   defdelegate get_by_id(id), to: @adapter
 
   @callback all() :: list()

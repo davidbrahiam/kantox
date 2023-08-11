@@ -43,7 +43,7 @@ defmodule Kantox.Warmers.ProductTest do
                price: Decimal.new("11.23"),
                promotion: %Kantox.Models.Promotion{
                  condition: :greater_than,
-                 discount: Decimal.new("7.4867"),
+                 discount: Decimal.new("3.7436"),
                  elements: 3
                }
              }

@@ -61,7 +61,23 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
 
   describe "POST /products/purchase" do
     @tag :products_purchase
+    test "when requested and items not found return error", %{conn: conn} do
+      body_params = %{
+        "basket" => ["GR1", "SR1", "CF1"]
+      }
+
+      %{status: 404, resp_body: response} =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(Routes.products_path(conn, :purchase), body_params)
+
+      assert Jason.decode!(response) == "Invalid products in the basket's list"
+    end
+
+    @tag :products_purchase
     test "when requested returns the total amount to pay given a basket", %{conn: conn} do
+      :ok = Kantox.Warmers.Product.execute()
+
       body_params = %{
         "basket" => ["GR1", "SR1", "CF1"]
       }
@@ -71,7 +87,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post(Routes.products_path(conn, :purchase), body_params)
 
-      assert Jason.decode!(response) == %{"total" => 0}
+      assert Jason.decode!(response) == %{"total" => "19.34"}
     end
 
     @tag :products_purchase
@@ -85,7 +101,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post(Routes.products_path(conn, :purchase), body_params)
 
-      assert Jason.decode!(response) == %{"total" => 0}
+      assert Jason.decode!(response) == %{"total" => "0.00"}
     end
 
     @tag :products_purchase
@@ -100,6 +116,38 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
         |> post(Routes.products_path(conn, :purchase), body_params)
 
       assert Jason.decode!(response) == "Bad Request"
+    end
+
+    @tag :products_purchase
+    test "creating a custom promotion and attempting to purchase it", %{conn: conn} do
+      # So we are looking for create a custom promotion that works like this
+      # For every `test product` that we buy we get a 20% of discount on that product
+      body_params = %{
+        "id" => "test",
+        "name" => "Testing",
+        "price" => "6.2",
+        "promotion" => %{
+          "elements" => 1,
+          "discount" => 6.2 * 0.2,
+          "condition" => "equal_to"
+        }
+      }
+
+      %{status: 200} =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> put(Routes.products_path(conn, :upsert), body_params)
+
+      body_params = %{
+        "basket" => ["test", "test", "test", "test", "test", "test", "test"]
+      }
+
+      %{status: 200, resp_body: response} =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(Routes.products_path(conn, :purchase), body_params)
+
+      assert Jason.decode!(response) == %{"total" => "34.72"}
     end
   end
 

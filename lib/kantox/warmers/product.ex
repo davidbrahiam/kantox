@@ -29,7 +29,7 @@ defmodule Kantox.Warmers.Product do
         id: "CF1",
         name: "Coffee",
         price: 11.23,
-        promotion: %{condition: "greater_than", discount: 7.4867, elements: 3}
+        promotion: %{condition: "greater_than", discount: 3.7436, elements: 3}
       }
     ]
     |> Enum.each(fn product ->
