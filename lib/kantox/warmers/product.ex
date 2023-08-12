@@ -17,7 +17,7 @@ defmodule Kantox.Warmers.Product do
         id: "GR1",
         name: "Green tea",
         price: 3.11,
-        promotion: %{condition: "equal_to", discount: 1.555, elements: 2}
+        promotion: %{condition: "get_elements_pay_discount", discount: 1, elements: 2}
       },
       %{
         id: "SR1",

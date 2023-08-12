@@ -41,4 +41,16 @@ defmodule Kantox.Utils do
       nil
     end
   end
+
+  def validate_chart_id(string) when is_binary(string) do
+    charts_users = :persistent_term.get(:charts_users)
+
+    if string in charts_users do
+      {:ok, String.to_existing_atom(string)}
+    else
+      {:error, "invalid string"}
+    end
+  end
+
+  def validate_chart_id(_), do: {:error, "invalid string"}
 end

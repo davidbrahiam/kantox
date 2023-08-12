@@ -19,7 +19,7 @@ defmodule KantoxWeb.Services.Products.PurchaseTest do
   end
 
   @tag :purchase_service
-  test "when requested equal_to promotion" do
+  test "when requested get_elements_pay_discount promotion" do
     basket = %{basket: ["GR1", "GR1", "SR1", "CF1"]}
 
     response = KantoxWeb.Services.Products.Purchase.purchase(basket)
@@ -28,7 +28,7 @@ defmodule KantoxWeb.Services.Products.PurchaseTest do
   end
 
   @tag :purchase_service
-  test "when requested equal_to promotion and extra amount" do
+  test "when requested get_elements_pay_discount promotion and extra amount" do
     basket = %{basket: ["GR1", "GR1", "GR1", "GR1", "GR1", "SR1", "CF1"]}
 
     response = KantoxWeb.Services.Products.Purchase.purchase(basket)

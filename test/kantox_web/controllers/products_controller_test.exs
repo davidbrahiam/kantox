@@ -1,4 +1,4 @@
-defmodule KantoxWeb.Controllers.ProductControllerTest do
+defmodule KantoxWeb.Controllers.ProductsControllerTest do
   use KantoxWeb.ConnCase, async: true
 
   setup do
@@ -119,7 +119,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
     end
 
     @tag :products_purchase
-    test "creating a custom promotion and attempting to purchase it", %{conn: conn} do
+    test "creating a custom promotion `greater_than` and attempting to purchase it", %{conn: conn} do
       # So we are looking for create a custom promotion that works like this
       # For every `test product` that we buy we get a 20% of discount on that product
       body_params = %{
@@ -129,7 +129,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
         "promotion" => %{
           "elements" => 1,
           "discount" => 6.2 * 0.2,
-          "condition" => "equal_to"
+          "condition" => "greater_than"
         }
       }
 
@@ -149,6 +149,116 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
 
       assert Jason.decode!(response) == %{"total" => "34.72"}
     end
+
+    @tag :products_purchase
+    test "creating a custom promotion `get_elements_pay_discount` 1x3 and attempting to purchase it",
+         %{conn: conn} do
+      # So we are looking for create a custom promotion that works like this
+      # We want to give to the custumer free products, so lets say that if you buy 1 you take 3
+      body_params = %{
+        "id" => "test",
+        "name" => "Testing",
+        "price" => "6.2",
+        "promotion" => %{
+          "elements" => 3,
+          "discount" => 1,
+          "condition" => "get_elements_pay_discount"
+        }
+      }
+
+      %{status: 200} =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> put(Routes.products_path(conn, :upsert), body_params)
+
+      body_params = %{
+        "basket" => ["test", "test", "test", "test"]
+      }
+
+      %{status: 200, resp_body: response} =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(Routes.products_path(conn, :purchase), body_params)
+
+      assert Jason.decode!(response) == %{"total" => "12.40"}
+    end
+
+    @tag :products_purchase
+    test "creating a custom promotion `get_elements_pay_discount` give free products",
+         %{conn: conn} do
+      # So we are looking for create a custom promotion that works like this
+      # We want to give to the custumer total free products
+      body_params = %{
+        "id" => "test",
+        "name" => "Testing",
+        "price" => "6.2",
+        "promotion" => %{
+          "elements" => 1,
+          "discount" => 0.000001,
+          "condition" => "get_elements_pay_discount"
+        }
+      }
+
+      %{status: 200} =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> put(Routes.products_path(conn, :upsert), body_params)
+
+      body_params = %{
+        "basket" => ["test", "test", "test", "test"]
+      }
+
+      %{status: 200, resp_body: response} =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(Routes.products_path(conn, :purchase), body_params)
+
+      assert Jason.decode!(response) == %{"total" => "0.00"}
+    end
+
+    @tag :products_purchase
+    test "creating a custom promotion `get_elements_pay_discount` 2x3 and attempting to purchase it",
+         %{conn: conn} do
+      # So we are looking for create a custom promotion that works like this
+      # We want to give to the custumer free products, so lets say that if you buy 2 you take 3
+      body_params = %{
+        "id" => "test",
+        "name" => "Testing",
+        "price" => "6.2",
+        "promotion" => %{
+          "elements" => 3,
+          "discount" => 2,
+          "condition" => "get_elements_pay_discount"
+        }
+      }
+
+      %{status: 200} =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> put(Routes.products_path(conn, :upsert), body_params)
+
+      body_params = %{
+        "basket" => ["test", "test", "test", "test"]
+      }
+
+      %{status: 200, resp_body: response} =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(Routes.products_path(conn, :purchase), body_params)
+
+      assert Jason.decode!(response) == %{"total" => "18.60"}
+
+      body_params = %{
+        "basket" => ["test", "test", "test"]
+      }
+
+      %{status: 200, resp_body: response} =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(Routes.products_path(conn, :purchase), body_params)
+
+      assert Jason.decode!(response) == %{"total" => "12.40"}
+    end
   end
 
   describe "PUT /products/upsert" do
@@ -162,7 +272,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
           "promotion" => %{
             "elements" => 3,
             "discount" => "0.1",
-            "condition" => "equal_to"
+            "condition" => "get_elements_pay_discount"
           }
         })
 
@@ -175,7 +285,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
                   name: "White tea",
                   price: Decimal.new("4.2"),
                   promotion: %Kantox.Models.Promotion{
-                    condition: :equal_to,
+                    condition: :get_elements_pay_discount,
                     discount: Decimal.new("0.1"),
                     elements: 3
                   }
@@ -189,7 +299,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
         "promotion" => %{
           "elements" => 3,
           "discount" => 2.1,
-          "condition" => "equal_to"
+          "condition" => "get_elements_pay_discount"
         }
       }
 
@@ -206,7 +316,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
                  "promotion" => %{
                    "elements" => 3,
                    "discount" => "2.1",
-                   "condition" => "equal_to"
+                   "condition" => "get_elements_pay_discount"
                  }
                }
 
@@ -219,7 +329,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
                      name: "Green teas",
                      price: Decimal.new("4.2"),
                      promotion: %Kantox.Models.Promotion{
-                       condition: :equal_to,
+                       condition: :get_elements_pay_discount,
                        discount: Decimal.new("2.1"),
                        elements: 3
                      }
@@ -237,7 +347,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
         "promotion" => %{
           "elements" => 3,
           "discount" => 0.1,
-          "condition" => "equal_to"
+          "condition" => "get_elements_pay_discount"
         }
       }
 
@@ -250,7 +360,11 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
                "id" => "MP1",
                "name" => "Milk",
                "price" => "1.2",
-               "promotion" => %{"condition" => "equal_to", "discount" => "0.1", "elements" => 3}
+               "promotion" => %{
+                 "condition" => "get_elements_pay_discount",
+                 "discount" => "0.1",
+                 "elements" => 3
+               }
              }
     end
 
@@ -263,7 +377,7 @@ defmodule KantoxWeb.Controllers.ProductControllerTest do
         "promotion" => %{
           "elements" => 3,
           "discount" => 3.1,
-          "condition" => "equal_to"
+          "condition" => "get_elements_pay_discount"
         }
       }
 

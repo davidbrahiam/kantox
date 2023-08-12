@@ -24,6 +24,8 @@ config :kantox, :default_table, :products
 
 config :kantox, :warmers, [Kantox.Warmers.Product]
 
+config :kantox, :charts, [:chart_1, :chart_2, :chart_3]
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

@@ -40,6 +40,7 @@ defmodule Kantox.MixProject do
       {:tarams, "~> 1.0.0"},
       {:plug_cowboy, "~> 2.5"},
       {:ecto_enum, "~> 1.4"},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:mox, "~> 1.0", only: :test}
     ]
   end

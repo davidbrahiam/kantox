@@ -12,6 +12,7 @@ defmodule Kantox.Application do
         [
           # Start the Telemetry supervisor
           KantoxWeb.Telemetry,
+          Kantox.Chart.Supervisor,
           # Start the Endpoint (http/https)
           KantoxWeb.Endpoint
         ]
@@ -19,7 +20,14 @@ defmodule Kantox.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Kantox.Supervisor]
-    Supervisor.start_link(children, opts)
+
+    with {:ok, _supervisor} = return <- Supervisor.start_link(children, opts) do
+      # Start Kantox Charts
+      Kantox.Chart.Supervisor.start_workers()
+
+      # Proper return
+      return
+    end
   end
 
   # Tell Phoenix to update the endpoint configuration

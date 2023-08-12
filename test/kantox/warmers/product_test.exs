@@ -18,8 +18,8 @@ defmodule Kantox.Warmers.ProductTest do
                name: "Green tea",
                price: Decimal.new("3.11"),
                promotion: %Kantox.Models.Promotion{
-                 condition: :equal_to,
-                 discount: Decimal.new("1.555"),
+                 condition: :get_elements_pay_discount,
+                 discount: Decimal.new("1"),
                  elements: 2
                }
              }

@@ -5,7 +5,7 @@ defmodule KantoxWeb.Services.Products.Purchase do
   Let's suppouse we have the following data in our system
   | Product code |    Name      | Price | Promotion                                   |
   | GR1          | Green tea    | 3.11  | Buy 1 get one free                          |
-  | SR1          | Strawberries | 5.00  | If you buy 3 or more strawberries, the price should drop to £4.50
+  | SR1          | Strawberries | 5.00  | If you buy 3 or more strawberries, the price should drop to 4.50
   per strawberry. |
   | CF1          | Coffee       | 11.23 | If you buy 3 or more coffees, the price of all coffees should drop
   to two thirds of the original price. |
@@ -80,7 +80,7 @@ defmodule KantoxWeb.Services.Products.Purchase do
   end
 
   defp calculate_price_with_promotion(
-         %{condition: :equal_to, elements: elements, discount: individual_discount},
+         %{condition: :get_elements_pay_discount, elements: elements, discount: amount_to_pay},
          individual_price,
          amount
        ) do
@@ -90,12 +90,59 @@ defmodule KantoxWeb.Services.Products.Purchase do
       |> Decimal.to_integer()
       |> case do
         0 ->
-          to_pay = Decimal.sub(individual_price, individual_discount)
-          Decimal.mult(amount, to_pay)
+          # In case the amount and the elements are dividable from each other
+          # We just take the indivual_price and multply for the groups of elements applying the discount
 
-        k ->
-          discounts = Decimal.sub(individual_price, individual_discount)
-          Decimal.mult(amount + k, discounts)
+          # Example:
+          # Attempting to buy [GR1, GR1, GR1, GR1] when the promotion for GR1 is buy 1 get one
+          # (discount = 1), this means that the `elements` to be granted to such promotion is `2`
+
+          # So we will have the following, individual_price: 3.11, amount: 4, elements: 2, discount: 1
+          # total = (amount/elements) * discount * individual_price
+          # total = (4/2) * 1 * 3.11
+          # total = 6.22
+
+          pairs_of_element_present_in_amount = Decimal.div(amount, elements)
+
+          amount_to_pay_per_pair = Decimal.mult(pairs_of_element_present_in_amount, amount_to_pay)
+
+          Decimal.mult(individual_price, amount_to_pay_per_pair)
+
+        remainder ->
+          # In case the amount and the elements are not dividable from each other
+          # We take the amount that IT IS dividable ignoring the remainder and aplying the promotion
+          # Then we add the reminder without the promotion
+
+          # Example:
+          # Attempting to buy [GR1, GR1, GR1] when the promotion for GR1 is buy 1 get one
+          # (discount = 1), this means that the `elements` to be granted to such promotion is `2`
+
+          # So we will have the following, individual_price: 3.11, amount: 3, elements: 2, discount: 1
+          # remainer = (amount % elements)
+          # amount_with_promotion = (amount - reminder) / elements
+          # total_for_elements_with_promotion = amount_with_promotion * discount * individual_price
+          # total_for_elements_without_promotion = individual_price * remainder
+          # total = total_for_elements_with_promotion + total_for_elements_without_promotion
+
+          # remainer = (3 % 2)
+          # amount_with_promotion = (3 - 1) / 2
+          # total_for_elements_with_promotion = 1 * 1 * 3.11
+          # total_for_elements_without_promotion = 3.11 * 1
+
+          # total = 3.11 + 3.11
+          # total = 6.22
+
+          elements_to_apply_promotion = Decimal.sub(amount, remainder)
+
+          amount_with_promotion = Decimal.div(elements_to_apply_promotion, elements)
+          total_for_elements_with_promotion = Decimal.mult(amount_with_promotion, amount_to_pay)
+
+          total_for_elements_with_promotion =
+            Decimal.mult(individual_price, total_for_elements_with_promotion)
+
+          total_for_elements_without_promotion = Decimal.mult(individual_price, remainder)
+
+          Decimal.add(total_for_elements_with_promotion, total_for_elements_without_promotion)
       end
     end
 

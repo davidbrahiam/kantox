@@ -9,7 +9,7 @@ defmodule Kantox.Models.Promotion do
   @required [:elements, :discount, :condition]
 
   defenum(Condition,
-    equal_to: 1,
+    get_elements_pay_discount: 1,
     greater_than: 2
   )
 
@@ -24,6 +24,7 @@ defmodule Kantox.Models.Promotion do
     changeset
     |> cast(params, @required)
     |> validate_required(@required)
+    |> validate_number(:elements, greater_than: 0)
     |> maybe_validate()
     |> validate_limit(params)
   end
