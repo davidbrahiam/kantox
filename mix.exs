@@ -33,10 +33,15 @@ defmodule Kantox.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.7.7"},
+      {:ecto, "~> 3.0"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:tarams, "~> 1.0.0"},
+      {:plug_cowboy, "~> 2.5"},
+      {:ecto_enum, "~> 1.4"},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:mox, "~> 1.0", only: :test}
     ]
   end
 
@@ -49,7 +54,7 @@ defmodule Kantox.MixProject do
   defp aliases do
     [
       setup: ["deps.get"],
-      test: ["test"],
+      test: ["test"]
     ]
   end
 end

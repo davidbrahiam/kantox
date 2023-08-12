@@ -24,6 +24,8 @@ defmodule KantoxWeb.ConnCase do
 
       use KantoxWeb, :verified_routes
 
+      alias KantoxWeb.Router.Helpers, as: Routes
+
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
