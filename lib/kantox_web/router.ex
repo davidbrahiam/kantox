@@ -31,8 +31,8 @@ defmodule KantoxWeb.Router do
     scope "/charts" do
       get "/basket", ChartsController, :basket
       get "/total_price", ChartsController, :total_price
-      scope "/products" do
 
+      scope "/products" do
         post "/add_product", ChartsController, :add_product
         post "/remove_product", ChartsController, :remove_product
       end

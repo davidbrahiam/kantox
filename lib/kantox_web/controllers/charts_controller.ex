@@ -41,9 +41,8 @@ defmodule KantoxWeb.Controllers.ChartsController do
     product_id: [type: :string, required: true]
   }
   def add_product(conn, params) do
-
     {status, response} =
-      with {:ok, %{chart_id: chart_id} = params} <- Tarams.cast(params, @add_product_schema) ,
+      with {:ok, %{chart_id: chart_id} = params} <- Tarams.cast(params, @add_product_schema),
            {:ok, worker_id} <- Kantox.Utils.validate_chart_id(chart_id) do
         request = Map.put(params, :chart_id, worker_id)
         KantoxWeb.Services.Charts.AddProduct.add_product(request)

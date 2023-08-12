@@ -35,10 +35,8 @@ defmodule KantoxWeb.Controllers.ChartControllerTest do
 
       params = %{"chart_id" => chart_id, "product_id" => "GR1"}
 
-
       %{status: 200, resp_body: response} =
         post(conn, Routes.charts_path(conn, :add_product), params)
-
 
       assert Jason.decode!(response) == %{"basket" => ["GR1"]}
 
