@@ -161,10 +161,17 @@ You should get a response similar like this:
 
 | PROMOTION FIELDS | REQUIRED FIELD? | TYPE | DESCRIPTION | POSSIBLES VALUES | 
 |--------|-----------------|------|-------------|------------------|
-| condition | TRUE | String | It defines the type/logic to follow in order to apply the promotion | greater_than, get_elements_pay_discount |
+| condition | TRUE | **Condition** | It defines the type/logic to follow in order to apply the promotion | greater_than, get_elements_pay_discount |
 | discount | TRUE | Number | It indicates the amount to be deducted from the original price when the promotion is applied | Any positive number |
 | elements | TRUE | Integer | Amount of elements to reach in order to apply the promotion | Any positive integer |
 
+
+**Condition Type**
+So currently we have 2 condition types, both strings:
+  * **get_elements_pay_discount**: This type defines that if you reach the amount of **elements** you will pay the
+    the value of **discount** * **price of the product** for all the **elements** defined. 
+  * **greater_than**: This type defines that if you reach the amount of **elements** or overpasses, the
+    discount will be applied per each product of this type present in your basket.
 
 ### POST /products/purchase
 We have here and example: Request POST URL [/products/purchase](http://localhost:4000/products/purchase)
